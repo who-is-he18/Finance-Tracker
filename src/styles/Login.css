@@ -1,0 +1,114 @@
+/* General Page Styles */
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f2fdf2; /* Light green background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Login Container */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+}
+
+/* Login Form Wrapper */
+.login-form {
+    background-color: #ffffff; /* White background */
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Login Heading */
+.login-heading {
+    font-size: 2rem;
+    color: #4CAF50; /* Vibrant green */
+    margin-bottom: 25px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Login Input Fields */
+.login-input {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 16px; /* Added spacing between inputs */
+    border: 1px solid #040404;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    outline: none;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.login-input:focus {
+    border-color: #4CAF50;
+    background-color: #eefcee;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.2);
+}
+
+.login-input::placeholder {
+    color: #828080;
+}
+
+/* Error Message */
+.error {
+    color: #e74c3c; /* Red for error */
+    font-size: 0.85rem;
+    margin-top: -8px; /* Adjust spacing for error messages */
+    margin-bottom: 8px; /* Add space below error messages */
+    text-align: left;
+}
+
+/* Login Button */
+.login-button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px; /* Added spacing above the button */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.login-button:hover {
+    background-color: #43a047;
+    transform: translateY(-2px);
+}
+
+.login-button:active {
+    background-color: #388e3c;
+    transform: translateY(0);
+}
+/* Link and Text Styling */
+.login-text, .form-text {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #4CAF50;
+}
+
+.login-text a, .form-text a {
+    color: #43a047;
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-text a:hover, .form-text a:hover {
+    color: #2e7d32;
+    text-decoration: underline;
+}

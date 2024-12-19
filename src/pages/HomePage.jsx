@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import '../styles/HomePage.css';
@@ -21,8 +22,12 @@ const HomePage = () => {
           </ul>
         </nav>
         <div className="auth-buttons" data-aos="fade-left">
-          <button className="signup-btn">SignUp</button>
-          <button className="login-btn">Login</button>
+          <Link to="/signup">
+            <button className="signup-btn">SignUp</button>
+          </Link>
+          <Link to="/login">
+            <button className="login-btn">Login</button>
+          </Link>
         </div>
       </header>
 
@@ -36,6 +41,14 @@ const HomePage = () => {
             Visualize your spending patterns with detailed graphs, and make smarter decisions.<br />
             Start today and experience the simplicity of managing your finances!
           </p>
+          <div className="hero-buttons">
+            <Link to="/signup">
+              <button className="hero-signup-btn">Sign Up</button>
+            </Link>
+            <Link to="/login">
+              <button className="hero-login-btn">Login</button>
+            </Link>
+          </div>
         </div>
         <div className="hero-image" data-aos="fade-left">
           <img src="/images/Revenue-bro.png" alt="Financial Illustration" />

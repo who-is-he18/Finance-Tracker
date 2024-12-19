@@ -79,6 +79,51 @@
     height: auto;
     object-fit: contain; 
   }
+  /* General Button Styling */
+.hero-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 15px; /* Adds space between the buttons */
+}
+
+.hero-signup-btn,
+.hero-login-btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.hero-signup-btn {
+  background-color: #4caf50; /* Green for Sign Up */
+}
+
+.hero-login-btn {
+  background-color: #4caf50; /* Blue for Login */
+}
+
+/* Hover Effects */
+.hero-signup-btn:hover {
+  background-color: #45a049; /* Darker green on hover */
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+.hero-login-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+  transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Focus Effects */
+.hero-signup-btn:focus,
+.hero-login-btn:focus {
+  outline: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
 /* What We Offer Section */
 .offer-section {
   text-align: center;
