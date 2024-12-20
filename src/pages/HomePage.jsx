@@ -12,10 +12,10 @@ const HomePage = () => {
   return (
     <>
       {/* Navbar */}
-      <header className="navbar">
+      <header className="navbar1">
         <div className="logo" data-aos="fade-right">PENNYWISE</div>
         <nav>
-          <ul className="nav-links" data-aos="fade-down">
+          <ul className="nav-links1" data-aos="fade-down">
             <li><a href="#">About Us</a></li>
             <li><a href="#">Contact Us</a></li>
             <li><a href="#">Privacy Policy</a></li>

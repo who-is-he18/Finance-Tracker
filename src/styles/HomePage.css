@@ -1,5 +1,5 @@
 /* Navbar */
-.navbar {
+.navbar1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -15,7 +15,7 @@
     color: #000;
   }
   
-  .nav-links {
+  .nav-links1 {
     list-style: none;
     display: flex;
     gap: 1.5rem;
@@ -23,7 +23,7 @@
     padding: 0;
   }
   
-  .nav-links a {
+  .nav-links1 a {
     text-decoration: none;
     color: #000;
     font-size: 1rem;
