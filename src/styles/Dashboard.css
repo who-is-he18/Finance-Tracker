@@ -8,7 +8,7 @@
 
 /* Sidebar */
 .sidebar {
-    width: 60%;
+    width: 80%;
     background-color: #ffffff; /* White sidebar */
     padding: 50px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -94,6 +94,7 @@
     align-items: start;
 }
 
+/* Card Hover Effect */
 .card {
     background-color: #ffffff;
     border: 1px solid #dddddd;
@@ -102,10 +103,32 @@
     padding: 20px;
     position: relative;
     text-align: left;
-    transition: box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, z-index 0.3s ease;
     cursor: pointer;
     width: 500px;
+    z-index: 1; /* Default stacking context */
 }
+
+.card:hover {
+    transform: scale(1.2); /* Make the card larger */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Add a deeper shadow */
+    z-index: 10; /* Bring the card to the front */
+    position: relative;
+}
+
+/* Center the card on hover */
+.card:hover ~ .dashboard-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ensure other cards fade out slightly when one is focused */
+.dashboard-main:hover .card:not(:hover) {
+    opacity: 0.6;
+    transform: scale(0.9); /* Slightly reduce size of other cards */
+}
+
 
 .card-title {
     font-size: 1.5rem;
