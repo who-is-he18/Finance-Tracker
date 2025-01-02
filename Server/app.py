@@ -1,27 +1,38 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from models.user import User
-from models.transaction import Transaction
-from models.setting import Setting
-from db import db  
-
+from flask_restful import Api
+from flask_cors import CORS
+from db import db
 
 # Initialize the Flask application
 app = Flask(__name__)
 
-# Configure the database URI
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://pennywise_6ruk_user:gJsVjUaiPdaI3BPyzVBn9VpcKPuMH607@dpg-ctp767jtq21c73d2is1g-a.oregon-postgres.render.com/pennywise_6ruk?sslmode=require'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
+# Enable CORS for the specific React frontend origin
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 
-# Initialize SQLAlchemy
+# Configure the database URI
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://pennywise_6ruk_user:gJsVjUaiPdaI3BPyzVBn9VpcKPuMH607@dpg-ctp767jtq21c73d2is1g-a.oregon-postgres.render.com/pennywise_6ruk'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
+app.config['SECRET_KEY'] = 'your_secret_key'
+
+# Initialize Flask-RESTful API
+api = Api(app)
+
+# Initialize Migrate with the app and db object
+migrate = Migrate(app, db)
+
+# Initialize the database with the app
 db.init_app(app)
 
-# Initialize Flask-Migrate for database migrations
-migrate = Migrate(app, db)
+# Import the resources after app and db initialization
+from resources.user import UserResource, LoginResource
+
+# Add resources to the API
+api.add_resource(UserResource, '/api/users', '/api/users/<int:user_id>')
+api.add_resource(LoginResource, '/api/login')
+
+# Import models after app initialization
 from models.user import User
-from models.transaction import Transaction
-from models.setting import Setting
 
 @app.route('/')
 def home():
