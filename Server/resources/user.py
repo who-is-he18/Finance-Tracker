@@ -32,21 +32,21 @@ class UserResource(Resource):
         if user_id:
             user = User.query.get(user_id)
             if not user:
-                return jsonify({'message': 'User not found'}), 404
+                return {'message': 'User not found'}, 404
 
-            return jsonify({
+            return {
                 'id': user.id,
                 'username': user.username,
                 'email': user.email
-            }), 200
+            }, 200
 
-        # Retrieve all users
         users = User.query.all()
-        return jsonify([{
+        return [{
             'id': user.id,
             'username': user.username,
             'email': user.email
-        } for user in users]), 200
+        } for user in users], 200
+    
 
     def put(self, user_id):
         """Update user details."""

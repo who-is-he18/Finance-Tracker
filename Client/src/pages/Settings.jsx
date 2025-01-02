@@ -3,6 +3,22 @@ import "../styles/Settings.css";
 
 const Settings = () => {
   const [theme, setTheme] = useState("light");
+  const [mpesaBalance, setMpesaBalance] = useState("");
+  const [familyBankBalance, setFamilyBankBalance] = useState("");
+  const [equityBankBalance, setEquityBankBalance] = useState("");
+  const userId = 9; // Replace with actual logged-in user ID
+
+  useEffect(() => {
+    // Fetch the settings (initial balances) when the component loads
+    fetch(`http://localhost:5000/api/settings/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.mpesa_balance) setMpesaBalance(data.mpesa_balance);
+        if (data.family_bank_balance) setFamilyBankBalance(data.family_bank_balance);
+        if (data.equity_bank_balance) setEquityBankBalance(data.equity_bank_balance);
+      })
+      .catch((error) => console.error("Error fetching settings:", error));
+  }, [userId]);
 
   useEffect(() => {
     document.body.className = theme; // Apply theme class to body
@@ -13,10 +29,27 @@ const Settings = () => {
     localStorage.setItem("theme", newTheme); // Save theme preference
   };
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    setTheme(savedTheme);
-  }, []);
+  const handleSaveBalances = () => {
+    const updatedSettings = {
+      mpesa_balance: parseFloat(mpesaBalance),
+      family_bank_balance: parseFloat(familyBankBalance),
+      equity_bank_balance: parseFloat(equityBankBalance),
+    };
+
+    fetch(`http://localhost:5000/api/settings/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedSettings),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Settings updated successfully:", data);
+        // Optionally notify the user with a success message
+      })
+      .catch((error) => console.error("Error updating settings:", error));
+  };
 
   return (
     <div className="settings-container">
@@ -85,16 +118,34 @@ const Settings = () => {
           <h2 className="section-title">Initial Currency Setup</h2>
           <div className="input-group">
             <label>M-pesa</label>
-            <input type="text" placeholder="Enter initial balance" />
+            <input
+              type="number"
+              value={mpesaBalance}
+              onChange={(e) => setMpesaBalance(e.target.value)}
+              placeholder="Enter initial balance"
+            />
           </div>
           <div className="input-group">
             <label>Family Bank</label>
-            <input type="text" placeholder="Enter initial balance" />
+            <input
+              type="number"
+              value={familyBankBalance}
+              onChange={(e) => setFamilyBankBalance(e.target.value)}
+              placeholder="Enter initial balance"
+            />
           </div>
           <div className="input-group">
             <label>Equity Bank</label>
-            <input type="text" placeholder="Enter initial balance" />
+            <input
+              type="number"
+              value={equityBankBalance}
+              onChange={(e) => setEquityBankBalance(e.target.value)}
+              placeholder="Enter initial balance"
+            />
           </div>
+          <button className="save-button" onClick={handleSaveBalances}>
+            Save Balances
+          </button>
         </section>
       </main>
     </div>

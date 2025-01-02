@@ -1,8 +1,43 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import "../styles/Transactions.css";
 
 const Transactions = () => {
+  const [transactions, setTransactions] = useState([]);
+  const [expenseData, setExpenseData] = useState({
+    Housing: 0,
+    Food: 0,
+    Recreational: 0,
+    Clothing: 0
+  });
+
+  useEffect(() => {
+    // Fetch the transactions from the API
+    const userId = 9; // Replace with the actual logged-in user ID
+    fetch(`http://localhost:5000/api/transactions/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setTransactions(data.transactions);
+
+        // Calculate expenses by category
+        const expenses = {
+          Housing: 0,
+          Food: 0,
+          Recreational: 0,
+          Clothing: 0
+        };
+
+        data.transactions.forEach((transaction) => {
+          if (transaction.category === "expense") {
+            expenses[transaction.source] += transaction.amount;
+          }
+        });
+
+        setExpenseData(expenses);
+      })
+      .catch((error) => console.error("Error fetching transactions:", error));
+  }, []);
+
   return (
     <div className="dashboard-container">
       {/* Main Content */}
@@ -19,15 +54,21 @@ const Transactions = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Example empty rows */}
-              <tr>
-                <td>---</td>
-                <td>---</td>
-                <td>---</td>
-                <td>---</td>
-                <td>---</td>
-              </tr>
-              {/* Add dynamic rows here */}
+              {transactions.length === 0 ? (
+                <tr>
+                  <td colSpan="5">No transactions found</td>
+                </tr>
+              ) : (
+                transactions.map((transaction) => (
+                  <tr key={transaction.id}>
+                    <td>{transaction.date}</td>
+                    <td>{transaction.category}</td>
+                    <td>{transaction.source}</td>
+                    <td>{transaction.amount}</td>
+                    <td>{transaction.description}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
           <button className="add-transaction-button">
@@ -38,12 +79,17 @@ const Transactions = () => {
         <section className="transactions-chart">
           <h3>Expenses by Category</h3>
           <div className="chart">
-             <div className="bar" style={{ height: "50%" }} data-label="Food"></div>
-             <div className="bar" style={{ height: "70%" }} data-label="Clothing"></div>
-             <div className="bar" style={{ height: "90%" }} data-label="Housing"></div>
-             <div className="bar" style={{ height: "80%" }} data-label="Recreational"></div>
+            {Object.entries(expenseData).map(([category, amount]) => (
+              <div
+                key={category}
+                className="bar"
+                style={{ height: `${(amount / 1000) * 100}%` }} // Adjust max value based on the data range
+                data-label={category}
+              >
+                <span className="category-label">{category}</span>
+              </div>
+            ))}
           </div>
-
         </section>
       </main>
     </div>

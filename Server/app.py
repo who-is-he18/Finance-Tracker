@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_cors import CORS
@@ -26,10 +26,17 @@ db.init_app(app)
 
 # Import the resources after app and db initialization
 from resources.user import UserResource, LoginResource
+from resources.setting import SettingsResource
+from resources.transaction import TransactionResource
+from resources.dashboard import DashboardResource
 
 # Add resources to the API
 api.add_resource(UserResource, '/api/users', '/api/users/<int:user_id>')
 api.add_resource(LoginResource, '/api/login')
+api.add_resource(SettingsResource, '/api/settings/<int:user_id>')
+api.add_resource(TransactionResource, '/api/transactions/<int:user_id>')
+api.add_resource(DashboardResource, '/api/dashboard/<int:user_id>')
+
 
 # Import models after app initialization
 from models.user import User
