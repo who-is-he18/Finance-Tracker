@@ -8,7 +8,13 @@ from db import db
 app = Flask(__name__)
 
 # Enable CORS for the specific React frontend origin
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "http://localhost:5173",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+    }
+})
 
 # Configure the database URI
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://pennywise_6ruk_user:gJsVjUaiPdaI3BPyzVBn9VpcKPuMH607@dpg-ctp767jtq21c73d2is1g-a.oregon-postgres.render.com/pennywise_6ruk'
@@ -34,9 +40,8 @@ from resources.dashboard import DashboardResource
 api.add_resource(UserResource, '/api/users', '/api/users/<int:user_id>')
 api.add_resource(LoginResource, '/api/login')
 api.add_resource(SettingsResource, '/api/settings/<int:user_id>')
-api.add_resource(TransactionResource, '/api/transactions/<int:user_id>')
+api.add_resource(TransactionResource, '/api/transactions/<int:user_id>', '/api/transactions/<int:user_id>/<int:transaction_id>')
 api.add_resource(DashboardResource, '/api/dashboard/<int:user_id>')
-
 
 # Import models after app initialization
 from models.user import User
