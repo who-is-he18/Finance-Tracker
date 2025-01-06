@@ -138,4 +138,12 @@
     --input-bg: #333333;
     --placeholder-color: #555;
   }
+  .password-toggle-icon {
+    position: absolute;
+    top: 50.9%;
+    right: 459px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #2e7d32;
+  }
   

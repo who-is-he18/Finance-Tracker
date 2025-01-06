@@ -7,9 +7,11 @@ import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
 import Layout from "./pages/Layout"; // Layout component
+import { ProfileProvider } from "./pages/ProfileContext";
 
 function App() {
   return (
+    <ProfileProvider>
     <Router>
       <Routes>
         {/* Public Routes */}
@@ -25,6 +27,7 @@ function App() {
         </Route>
       </Routes>
     </Router>
+    </ProfileProvider>
   );
 }
 
