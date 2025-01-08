@@ -10,11 +10,11 @@ class DashboardResource(Resource):
         income_transactions = Transaction.query.filter_by(user_id=user_id, category='income').all()
         expense_transactions = Transaction.query.filter_by(user_id=user_id, category='expense').all()
 
-        total_income = sum(t.amount for t in income_transactions)
+        # Calculate transaction-based income and expenses
+        transaction_income = sum(t.amount for t in income_transactions)
         total_expenses = sum(t.amount for t in expense_transactions)
-        current_savings = total_income - total_expenses
 
-        # Get the user's settings for initial currency setup
+        # Get the user's settings for initial balances
         settings = Settings.query.filter_by(user_id=user_id).first()
         if settings:
             mpesa_balance = settings.mpesa_balance
@@ -23,13 +23,19 @@ class DashboardResource(Resource):
         else:
             mpesa_balance = family_bank_balance = equity_bank_balance = 0
 
+        # Total income includes transaction-based income + initial balances
+        total_income = transaction_income + mpesa_balance + family_bank_balance + equity_bank_balance
+
+        # Current savings
+        current_savings = total_income - total_expenses
+
         # Fetch the user's username
         user = User.query.get(user_id)
         if not user:
             return {"message": "User not found"}, 404
 
         return {
-            'username': user.username,  # Add the username to the response
+            'username': user.username,
             'total_income': total_income,
             'total_expenses': total_expenses,
             'current_savings': current_savings,

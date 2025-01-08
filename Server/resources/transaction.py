@@ -1,62 +1,114 @@
 from flask_restful import Resource, reqparse
+from flask import request
 from models.transaction import Transaction
 from db import db
+import logging
 
 class TransactionResource(Resource):
-    def get(self, user_id):
-        """Retrieve all transactions for a specific user."""
-        transactions = Transaction.query.filter_by(user_id=user_id).all()
-        return {'transactions': [transaction.json() for transaction in transactions]}, 200
+    parser = reqparse.RequestParser()
+    parser.add_argument("type_of", type=str, required=True, help="Transaction type ('Income' or 'Expenses') is required.")
+    parser.add_argument("category", type=str, required=True, help="Category is required.")
+    parser.add_argument("source", type=str, required=True, help="Source is required.")
+    parser.add_argument("amount", type=float, required=True, help="Amount is required.")
+    parser.add_argument("description", type=str, required=False)
 
     def post(self, user_id):
-        """Create a new transaction for a specific user."""
-        parser = reqparse.RequestParser()
-        parser.add_argument('category', type=str, required=True, help="Category of transaction is required")
-        parser.add_argument('source', type=str, required=True, help="Source of transaction is required")
-        parser.add_argument('amount', type=float, required=True, help="Amount is required")
-        parser.add_argument('description', type=str, help="Description of the transaction")
-        data = parser.parse_args()
-
-        transaction = Transaction(
-            user_id=user_id,
-            category=data['category'],
-            source=data['source'],
-            amount=data['amount'],
-            description=data['description']
-        )
-
-        db.session.add(transaction)
-        db.session.commit()
+        """Handle POST request to create a new transaction for the user"""
+        data = TransactionResource.parser.parse_args()
+        transaction = Transaction(**data, user_id=user_id)  # Pass user_id from URL
+        try:
+            db.session.add(transaction)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return {"message": f"An error occurred while adding the transaction: {str(e)}"}, 500
 
         return transaction.json(), 201
 
-    def delete(self, user_id, transaction_id):
-        """Delete a specific transaction."""
-        transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
-        if not transaction:
-            return {"message": "Transaction not found"}, 404
-
-        db.session.delete(transaction)
-        db.session.commit()
-        return {"message": "Transaction deleted successfully"}, 200
+    def get(self, user_id):
+        """Get transactions for a specific user"""
+        transactions = Transaction.query.filter_by(user_id=user_id).all()
+        return {
+            "transactions": [transaction.json() for transaction in transactions]
+        }, 200
 
     def put(self, user_id, transaction_id):
-        """Update a specific transaction."""
-        parser = reqparse.RequestParser()
-        parser.add_argument('category', type=str, required=True, help="Category of transaction is required")
-        parser.add_argument('source', type=str, required=True, help="Source of transaction is required")
-        parser.add_argument('amount', type=float, required=True, help="Amount is required")
-        parser.add_argument('description', type=str, help="Description of the transaction")
-        data = parser.parse_args()
+        try:
+            logging.info(f"Received PUT request for user_id: {user_id}, transaction_id: {transaction_id}")
+            logging.info(f"Request data: {request.get_json()}")
 
+            # Find the transaction by user_id and transaction_id
+            transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
+
+            if not transaction:
+                return {'message': 'Transaction not found'}, 404
+
+            # Get the updated data from the request body
+            data = request.get_json()
+
+            # Update the fields if they exist in the request body
+            if 'type_of' in data:
+                transaction.type_of = data['type_of']
+            if 'category' in data:
+                transaction.category = data['category']
+            if 'source' in data:
+                transaction.source = data['source']
+            if 'amount' in data:
+                transaction.amount = data['amount']
+            if 'description' in data:
+                transaction.description = data['description']
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            return {'message': 'Transaction updated successfully', 'transaction': transaction.json()}, 200
+        except Exception as e:
+            logging.error(f"Error updating transaction: {str(e)}")
+            db.session.rollback()
+            return {'message': f'Error: {str(e)}'}, 500
+
+    def delete(self, user_id, transaction_id):
+        """Handle DELETE request to delete a transaction for the user"""
         transaction = Transaction.query.filter_by(id=transaction_id, user_id=user_id).first()
+
         if not transaction:
-            return {"message": "Transaction not found"}, 404
+            return {"message": "Transaction not found."}, 404
 
-        transaction.category = data['category']
-        transaction.source = data['source']
-        transaction.amount = data['amount']
-        transaction.description = data.get('description', transaction.description)
+        try:
+            db.session.delete(transaction)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return {"message": f"An error occurred while deleting the transaction: {str(e)}"}, 500
 
-        db.session.commit()
-        return transaction.json(), 200
+        return {"message": "Transaction deleted successfully."}, 200
+
+class TransactionSummaryResource(Resource):
+    def get(self, user_id):
+        """Summarize income and expenses for a user."""
+        transactions = Transaction.query.filter_by(user_id=user_id).all()
+        income = {}
+        expenses = {}
+
+        for transaction in transactions:
+            if transaction.type_of.lower() == "income":
+                income[transaction.category] = income.get(transaction.category, 0) + transaction.amount
+            elif transaction.type_of.lower() == "expenses":
+                expenses[transaction.category] = expenses.get(transaction.category, 0) + transaction.amount
+
+        return {
+            "income_summary": income,
+            "expense_summary": expenses
+        }, 200
+
+class ExpenseAggregationResource(Resource):
+    def get(self, user_id):
+        """Aggregate expenses by category for a specific user."""
+        expenses = Transaction.query.filter_by(user_id=user_id).all()
+        aggregated_expenses = {}
+
+        for expense in expenses:
+            category = expense.category
+            aggregated_expenses[category] = aggregated_expenses.get(category, 0) + expense.amount
+
+        return {"aggregated_expenses": aggregated_expenses}, 200

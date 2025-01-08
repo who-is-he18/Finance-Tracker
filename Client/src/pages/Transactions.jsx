@@ -1,13 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import {Chart as ChartJS,CategoryScale,LinearScale,BarElement,Title,Tooltip,Legend,} from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { ToastContainer, toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -20,43 +12,41 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
-  const [expenseData, setExpenseData] = useState({
-    Housing: 0,
-    Food: 0,
-    Recreational: 0,
-    Clothing: 0,
+  const [transactionData, setTransactionData] = useState({
+    Income: { Salary: 0, Investments: 0, Businesses: 0, Other: 0 },
+    Expenses: { Housing: 0, Food: 0, Recreational: 0, Clothing: 0 },
   });
   const [isEditing, setIsEditing] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [currentTransaction, setCurrentTransaction] = useState({
-    category: "Food",
+    type: "Income",
+    category: "Salary",
     source: "Family Bank",
     amount: "",
     description: "",
   });
 
+  const userId = 9; // Replace with dynamic user ID
+
   // Fetch transactions from the backend
   useEffect(() => {
-    const userId = 9;
     fetch(`http://localhost:5000/api/transactions/${userId}`)
       .then((response) => response.json())
       .then((data) => {
         setTransactions(data.transactions);
 
-        const aggregatedExpenses = {
-          Housing: 0,
-          Food: 0,
-          Recreational: 0,
-          Clothing: 0,
-        };
+        const incomeData = { Salary: 0, Investments: 0, Businesses: 0, Other: 0 };
+        const expenseData = { Housing: 0, Food: 0, Recreational: 0, Clothing: 0 };
 
         data.transactions.forEach((transaction) => {
-          if (transaction.category in aggregatedExpenses) {
-            aggregatedExpenses[transaction.category] += transaction.amount;
+          if (transaction.type_of === "Income") {
+            incomeData[transaction.category] += transaction.amount;
+          } else {
+            expenseData[transaction.category] += transaction.amount;
           }
         });
 
-        setExpenseData(aggregatedExpenses);
+        setTransactionData({ Income: incomeData, Expenses: expenseData });
       })
       .catch((error) => console.error("Error fetching transactions:", error));
   }, []);
@@ -64,6 +54,7 @@ const Transactions = () => {
   // Add new transaction
   const handleAddTransaction = (e) => {
     e.preventDefault();
+
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to add this transaction?",
@@ -73,9 +64,9 @@ const Transactions = () => {
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        const userId = 9;
         const transactionToAdd = {
           ...currentTransaction,
+          type_of: currentTransaction.type, // Change 'type' to 'type_of'
           amount: parseFloat(currentTransaction.amount || 0),
         };
 
@@ -88,11 +79,9 @@ const Transactions = () => {
           .then((data) => {
             setTransactions([...transactions, data]);
 
-            const updatedExpenseData = { ...expenseData };
-            if (data.category in updatedExpenseData) {
-              updatedExpenseData[data.category] += data.amount;
-            }
-            setExpenseData(updatedExpenseData);
+            const updatedTransactionData = { ...transactionData };
+            updatedTransactionData[data.type_of][data.category] += data.amount;
+            setTransactionData(updatedTransactionData);
 
             setIsAdding(false);
             resetForm();
@@ -106,93 +95,97 @@ const Transactions = () => {
     });
   };
 
-  // Edit existing transaction
+  // Edit a transaction
   const handleEditTransaction = (e) => {
     e.preventDefault();
+  
+    console.log("Current transaction before update:", currentTransaction);
+  
+    const updatedTransaction = {
+      ...currentTransaction,
+      type_of: currentTransaction.type_of, // Use 'type_of' directly
+      amount: parseFloat(currentTransaction.amount || 0),
+    };
+  
+    console.log("Updated transaction payload:", updatedTransaction);
+  
     Swal.fire({
       title: "Are you sure?",
-      text: "Do you want to edit this transaction?",
+      text: "Do you want to update this transaction?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Yes, edit it!",
+      confirmButtonText: "Yes, update it!",
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        const userId = 9;
-        const originalTransaction = transactions.find(
-          (transaction) => transaction.id === currentTransaction.id
-        );
-
-        if (!originalTransaction) return;
-
-        const prevCategory = originalTransaction.category;
-        const prevAmount = originalTransaction.amount;
-
         fetch(`http://localhost:5000/api/transactions/${userId}/${currentTransaction.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(currentTransaction),
+          body: JSON.stringify(updatedTransaction),
         })
-          .then((response) => response.json())
-          .then((data) => {
-            setTransactions((prev) =>
-              prev.map((transaction) =>
-                transaction.id === data.id ? data : transaction
-              )
-            );
-
-            const updatedExpenseData = { ...expenseData };
-            if (prevCategory !== currentTransaction.category) {
-              updatedExpenseData[prevCategory] -= prevAmount;
+          .then((response) => {
+            console.log("Response status:", response.status);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
             }
-            updatedExpenseData[currentTransaction.category] += currentTransaction.amount;
-
-            setExpenseData(updatedExpenseData);
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Response data:", data);
+  
+            // Update transactions state
+            const updatedTransactions = transactions.map((transaction) =>
+              transaction.id === data.id ? data : transaction
+            );
+            setTransactions(updatedTransactions);
+  
+            // Update transactionData state
+            const updatedTransactionData = { ...transactionData };
+            if (data.type_of && data.category) {
+              // Subtract the old amount and add the new amount
+              const oldTransaction = transactions.find((transaction) => transaction.id === data.id);
+              if (oldTransaction) {
+                updatedTransactionData[oldTransaction.type_of][oldTransaction.category] -= oldTransaction.amount;
+              }
+              updatedTransactionData[data.type_of][data.category] += data.amount;
+            }
+            setTransactionData(updatedTransactionData);
+  
             setIsEditing(false);
             resetForm();
             toast.success("Transaction updated successfully!");
           })
           .catch((error) => {
-            console.error("Error editing transaction:", error);
-            toast.error("Failed to edit transaction.");
+            console.error("Error updating transaction:", error);
+            toast.error("Failed to update transaction.");
           });
       }
     });
   };
 
-  // Delete transaction
-  const deleteTransaction = (transactionId) => {
+  // Delete a transaction
+  const handleDeleteTransaction = (id) => {
     Swal.fire({
       title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      text: "This transaction will be permanently deleted.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        const userId = 9;
-        const transactionToDelete = transactions.find(
-          (transaction) => transaction.id === transactionId
-        );
-
-        if (!transactionToDelete) return;
-
-        fetch(`http://localhost:5000/api/transactions/${userId}/${transactionId}`, {
+        fetch(`http://localhost:5000/api/transactions/${userId}/${id}`, {
           method: "DELETE",
         })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Failed to delete transaction");
-            }
-            setTransactions((prev) =>
-              prev.filter((transaction) => transaction.id !== transactionId)
-            );
+          .then((response) => response.json())
+          .then(() => {
+            setTransactions(transactions.filter((transaction) => transaction.id !== id));
 
-            const updatedExpenseData = { ...expenseData };
-            updatedExpenseData[transactionToDelete.category] -= transactionToDelete.amount;
-            setExpenseData(updatedExpenseData);
+            const deletedTransaction = transactions.find((t) => t.id === id);
+            const updatedTransactionData = { ...transactionData };
+            updatedTransactionData[deletedTransaction.type_of][deletedTransaction.category] -= deletedTransaction.amount;
 
+            setTransactionData(updatedTransactionData);
             toast.success("Transaction deleted successfully!");
           })
           .catch((error) => {
@@ -208,14 +201,15 @@ const Transactions = () => {
     const { name, value } = e.target;
     setCurrentTransaction({
       ...currentTransaction,
-      [name]: name === "amount" ? value : value,
+      [name]: value,
     });
   };
 
   // Reset form
   const resetForm = () => {
     setCurrentTransaction({
-      category: "Food",
+      type: "Income",
+      category: "Salary",
       source: "Family Bank",
       amount: "",
       description: "",
@@ -231,6 +225,7 @@ const Transactions = () => {
             <thead>
               <tr>
                 <th>Date</th>
+                <th>Type</th>
                 <th>Category</th>
                 <th>Source</th>
                 <th>Amount</th>
@@ -241,12 +236,13 @@ const Transactions = () => {
             <tbody>
               {transactions.length === 0 ? (
                 <tr>
-                  <td colSpan="6">No transactions found</td>
+                  <td colSpan="7">No transactions found</td>
                 </tr>
               ) : (
                 transactions.map((transaction) => (
                   <tr key={transaction.id}>
                     <td>{transaction.date}</td>
+                    <td>{transaction.type_of}</td>
                     <td>{transaction.category}</td>
                     <td>{transaction.source}</td>
                     <td>{transaction.amount}</td>
@@ -263,7 +259,7 @@ const Transactions = () => {
                       </button>
                       <button
                         className="delete-button"
-                        onClick={() => deleteTransaction(transaction.id)}
+                        onClick={() => handleDeleteTransaction(transaction.id)}
                       >
                         <i className="fa fa-trash"></i>
                       </button>
@@ -280,11 +276,23 @@ const Transactions = () => {
             Add New Transaction <span className="plus-icon">+</span>
           </button>
         </section>
+
         {/* Form Modal */}
         {(isAdding || isEditing) && (
           <div className="modal">
-            <form onSubmit={isAdding ? handleAddTransaction : handleEditTransaction}>
+            <form onSubmit={isEditing ? handleEditTransaction : handleAddTransaction}>
               <h2>{isAdding ? "Add New Transaction" : "Edit Transaction"}</h2>
+              <label>
+                Type:
+                <select
+                  name="type"
+                  value={currentTransaction.type}
+                  onChange={handleInputChange}
+                >
+                  <option value="Income">Income</option>
+                  <option value="Expenses">Expenses</option>
+                </select>
+              </label>
               <label>
                 Category:
                 <select
@@ -292,10 +300,21 @@ const Transactions = () => {
                   value={currentTransaction.category}
                   onChange={handleInputChange}
                 >
-                  <option value="Housing">Housing</option>
-                  <option value="Food">Food</option>
-                  <option value="Recreational">Recreational</option>
-                  <option value="Clothing">Clothing</option>
+                  {currentTransaction.type === "Income" ? (
+                    <>
+                      <option value="Salary">Salary</option>
+                      <option value="Investments">Investments</option>
+                      <option value="Businesses">Businesses</option>
+                      <option value="Other">Other</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="Housing">Housing</option>
+                      <option value="Food">Food</option>
+                      <option value="Recreational">Recreational</option>
+                      <option value="Clothing">Clothing</option>
+                    </>
+                  )}
                 </select>
               </label>
               <label>
@@ -328,21 +347,28 @@ const Transactions = () => {
                 />
               </label>
               <button type="submit">Save</button>
-              <button type="button" onClick={() => (isAdding ? setIsAdding(false) : setIsEditing(false))}>
+              <button type="button" onClick={() => setIsAdding(false)}>
                 Cancel
               </button>
             </form>
           </div>
         )}
+
+        {/* Transaction Graph */}
         <section className="transactions-graph">
           <Bar
             data={{
-              labels: Object.keys(expenseData),
+              labels: Object.keys(transactionData.Expenses),
               datasets: [
                 {
                   label: "Expenses",
-                  data: Object.values(expenseData),
-                  backgroundColor: "#4CAF50",
+                  data: Object.values(transactionData.Expenses),
+                  backgroundColor: "#FF6384",
+                },
+                {
+                  label: "Income",
+                  data: Object.values(transactionData.Income),
+                  backgroundColor: "#36A2EB",
                 },
               ],
             }}
@@ -351,7 +377,7 @@ const Transactions = () => {
               plugins: {
                 title: {
                   display: true,
-                  text: "Expense Categories",
+                  text: "Transaction Categories",
                 },
               },
             }}

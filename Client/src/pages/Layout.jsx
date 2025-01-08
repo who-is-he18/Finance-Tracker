@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import axios from "axios";
 import "../styles/Dashboard.css";
-import { useProfile } from "./ProfileContext";
 
 const Layout = () => {
   const [username, setUsername] = useState("");
-  const { profilePic, setProfilePic } = useProfile();
 
   useEffect(() => {
     const userId = 9; // Replace with actual user ID logic
@@ -22,7 +20,7 @@ const Layout = () => {
       .catch((error) => {
         console.error("Error fetching user data:", error);
       });
-  }, [setProfilePic]);
+  }, []);
 
   return (
     <div className="dashboard-container">
@@ -31,7 +29,7 @@ const Layout = () => {
         <div className="profile-section">
           <div className="profile-icon">
             <img
-              src={profilePic}
+              src="/images/user-profile_5675125.png"
               alt="Profile"
               className="profile-image"
             />
