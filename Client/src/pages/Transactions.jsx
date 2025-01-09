@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {Chart as ChartJS,CategoryScale,LinearScale,BarElement,Title,Tooltip,Legend,} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import { ToastContainer, toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -28,184 +28,195 @@ const Transactions = () => {
 
   const userId = 9; // Replace with dynamic user ID
 
-  // Fetch transactions from the backend
   useEffect(() => {
-    fetch(`http://localhost:5000/api/transactions/${userId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setTransactions(data.transactions);
-
-        const incomeData = { Salary: 0, Investments: 0, Businesses: 0, Other: 0 };
-        const expenseData = { Housing: 0, Food: 0, Recreational: 0, Clothing: 0 };
-
-        data.transactions.forEach((transaction) => {
-          if (transaction.type_of === "Income") {
-            incomeData[transaction.category] += transaction.amount;
-          } else {
-            expenseData[transaction.category] += transaction.amount;
-          }
-        });
-
-        setTransactionData({ Income: incomeData, Expenses: expenseData });
-      })
-      .catch((error) => console.error("Error fetching transactions:", error));
+    fetchTransactions();
   }, []);
 
-  // Add new transaction
-  const handleAddTransaction = (e) => {
+  const fetchTransactions = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/transactions/${userId}`);
+      const data = await response.json();
+      setTransactions(data.transactions);
+
+      const incomeData = { Salary: 0, Investments: 0, Businesses: 0, Other: 0 };
+      const expenseData = { Housing: 0, Food: 0, Recreational: 0, Clothing: 0 };
+
+      data.transactions.forEach((transaction) => {
+        if (transaction.type_of === "Income") {
+          incomeData[transaction.category] += transaction.amount;
+        } else {
+          expenseData[transaction.category] += transaction.amount;
+        }
+      });
+
+      setTransactionData({ Income: incomeData, Expenses: expenseData });
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentTransaction((prevTransaction) => {
+        const updatedTransaction = {
+            ...prevTransaction,
+            [name]: value,
+        };
+
+        // Reset category when type changes
+        if (name === "type") {
+            updatedTransaction.category = value === "Income" ? "Salary" : "Housing";
+        }
+
+        console.log("Updated currentTransaction:", updatedTransaction);
+        return updatedTransaction;
+    });
+  };
+
+  const handleAddTransaction = async (e) => {
     e.preventDefault();
 
-    Swal.fire({
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to add this transaction?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, add it!",
       cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const transactionToAdd = {
-          ...currentTransaction,
-          type_of: currentTransaction.type, // Change 'type' to 'type_of'
-          amount: parseFloat(currentTransaction.amount || 0),
-        };
+    });
 
-        fetch(`http://localhost:5000/api/transactions/${userId}`, {
+    if (result.isConfirmed) {
+      const transactionToAdd = {
+        ...currentTransaction,
+        type_of: currentTransaction.type,
+        amount: parseFloat(currentTransaction.amount || 0),
+      };
+
+      console.log("Transaction to add:", transactionToAdd);
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/transactions/${userId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(transactionToAdd),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            setTransactions([...transactions, data]);
+        });
 
-            const updatedTransactionData = { ...transactionData };
-            updatedTransactionData[data.type_of][data.category] += data.amount;
-            setTransactionData(updatedTransactionData);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-            setIsAdding(false);
-            resetForm();
-            toast.success("Transaction added successfully!");
-          })
-          .catch((error) => {
-            console.error("Error adding transaction:", error);
-            toast.error("Failed to add transaction.");
-          });
+        const data = await response.json();
+        console.log("Response data:", data); // Log the response data
+
+        // Directly use the data as the transaction object
+        const newTransaction = data;
+
+        setTransactions([...transactions, newTransaction]);
+
+        const updatedTransactionData = { ...transactionData };
+        updatedTransactionData[newTransaction.type_of][newTransaction.category] += newTransaction.amount;
+        setTransactionData(updatedTransactionData);
+
+        setIsAdding(false);
+        resetForm();
+        toast.success("Transaction added successfully!");
+      } catch (error) {
+        console.error("Error adding transaction:", error);
+        toast.error("Failed to add transaction.");
       }
-    });
+    }
   };
 
-  // Edit a transaction
-  const handleEditTransaction = (e) => {
+  const handleEditTransaction = async (e) => {
     e.preventDefault();
-  
-    console.log("Current transaction before update:", currentTransaction);
-  
-    const updatedTransaction = {
-      ...currentTransaction,
-      type_of: currentTransaction.type_of, // Use 'type_of' directly
-      amount: parseFloat(currentTransaction.amount || 0),
-    };
-  
-    console.log("Updated transaction payload:", updatedTransaction);
-  
-    Swal.fire({
+
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to update this transaction?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, update it!",
       cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`http://localhost:5000/api/transactions/${userId}/${currentTransaction.id}`, {
+    });
+
+    if (result.isConfirmed) {
+      const updatedTransaction = {
+        ...currentTransaction,
+        type_of: currentTransaction.type,
+        amount: parseFloat(currentTransaction.amount || 0),
+      };
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/transactions/${userId}/${currentTransaction.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updatedTransaction),
-        })
-          .then((response) => {
-            console.log("Response status:", response.status);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then((data) => {
-            console.log("Response data:", data);
-  
-            // Update transactions state
-            const updatedTransactions = transactions.map((transaction) =>
-              transaction.id === data.id ? data : transaction
-            );
-            setTransactions(updatedTransactions);
-  
-            // Update transactionData state
-            const updatedTransactionData = { ...transactionData };
-            if (data.type_of && data.category) {
-              // Subtract the old amount and add the new amount
-              const oldTransaction = transactions.find((transaction) => transaction.id === data.id);
-              if (oldTransaction) {
-                updatedTransactionData[oldTransaction.type_of][oldTransaction.category] -= oldTransaction.amount;
-              }
-              updatedTransactionData[data.type_of][data.category] += data.amount;
-            }
-            setTransactionData(updatedTransactionData);
-  
-            setIsEditing(false);
-            resetForm();
-            toast.success("Transaction updated successfully!");
-          })
-          .catch((error) => {
-            console.error("Error updating transaction:", error);
-            toast.error("Failed to update transaction.");
-          });
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Update the transactions state
+        const updatedTransactions = transactions.map((transaction) =>
+          transaction.id === data.transaction.id ? data.transaction : transaction
+        );
+        setTransactions(updatedTransactions);
+
+        // Update the transactionData state
+        const updatedTransactionData = { ...transactionData };
+        const oldTransaction = transactions.find((transaction) => transaction.id === currentTransaction.id);
+        if (oldTransaction) {
+          updatedTransactionData[oldTransaction.type_of][oldTransaction.category] -= oldTransaction.amount;
+        }
+        updatedTransactionData[data.transaction.type_of][data.transaction.category] += data.transaction.amount;
+        setTransactionData(updatedTransactionData);
+
+        setIsEditing(false);
+        resetForm();
+        toast.success("Transaction updated successfully!");
+      } catch (error) {
+        console.error("Error updating transaction:", error);
+        toast.error("Failed to update transaction.");
       }
-    });
+    }
   };
 
-  // Delete a transaction
-  const handleDeleteTransaction = (id) => {
-    Swal.fire({
+  const handleDeleteTransaction = async (id) => {
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "This transaction will be permanently deleted.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "Cancel",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`http://localhost:5000/api/transactions/${userId}/${id}`, {
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await fetch(`http://localhost:5000/api/transactions/${userId}/${id}`, {
           method: "DELETE",
-        })
-          .then((response) => response.json())
-          .then(() => {
-            setTransactions(transactions.filter((transaction) => transaction.id !== id));
+        });
 
-            const deletedTransaction = transactions.find((t) => t.id === id);
-            const updatedTransactionData = { ...transactionData };
-            updatedTransactionData[deletedTransaction.type_of][deletedTransaction.category] -= deletedTransaction.amount;
+        setTransactions(transactions.filter((transaction) => transaction.id !== id));
 
-            setTransactionData(updatedTransactionData);
-            toast.success("Transaction deleted successfully!");
-          })
-          .catch((error) => {
-            console.error("Error deleting transaction:", error);
-            toast.error("Failed to delete transaction.");
-          });
+        const deletedTransaction = transactions.find((t) => t.id === id);
+        if (deletedTransaction) {
+          const updatedTransactionData = { ...transactionData };
+          updatedTransactionData[deletedTransaction.type_of][deletedTransaction.category] -= deletedTransaction.amount;
+          setTransactionData(updatedTransactionData);
+        }
+
+        toast.success("Transaction deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting transaction:", error);
+        toast.error("Failed to delete transaction.");
       }
-    });
+    }
   };
 
-  // Input change handler
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCurrentTransaction({
-      ...currentTransaction,
-      [name]: value,
-    });
-  };
-
-  // Reset form
   const resetForm = () => {
     setCurrentTransaction({
       type: "Income",
@@ -215,6 +226,10 @@ const Transactions = () => {
       description: "",
     });
   };
+
+  const combinedLabels = [...new Set([...Object.keys(transactionData.Expenses), ...Object.keys(transactionData.Income)])];
+  const expenseData = combinedLabels.map(label => transactionData.Expenses[label] || 0);
+  const incomeData = combinedLabels.map(label => transactionData.Income[label] || 0);
 
   return (
     <div className="dashboard-container">
@@ -241,7 +256,7 @@ const Transactions = () => {
               ) : (
                 transactions.map((transaction) => (
                   <tr key={transaction.id}>
-                    <td>{transaction.date}</td>
+                    <td>{transaction.date ? transaction.date : "N/A"}</td>
                     <td>{transaction.type_of}</td>
                     <td>{transaction.category}</td>
                     <td>{transaction.source}</td>
@@ -252,7 +267,10 @@ const Transactions = () => {
                         className="edit-button"
                         onClick={() => {
                           setIsEditing(true);
-                          setCurrentTransaction(transaction);
+                          setCurrentTransaction({
+                            ...transaction,
+                            type: transaction.type_of,
+                          });
                         }}
                       >
                         <i className="fa fa-edit"></i>
@@ -347,7 +365,7 @@ const Transactions = () => {
                 />
               </label>
               <button type="submit">Save</button>
-              <button type="button" onClick={() => setIsAdding(false)}>
+              <button type="button" onClick={() => { setIsAdding(false); setIsEditing(false); resetForm(); }}>
                 Cancel
               </button>
             </form>
@@ -358,16 +376,16 @@ const Transactions = () => {
         <section className="transactions-graph">
           <Bar
             data={{
-              labels: Object.keys(transactionData.Expenses),
+              labels: combinedLabels,
               datasets: [
                 {
                   label: "Expenses",
-                  data: Object.values(transactionData.Expenses),
+                  data: expenseData,
                   backgroundColor: "#FF6384",
                 },
                 {
                   label: "Income",
-                  data: Object.values(transactionData.Income),
+                  data: incomeData,
                   backgroundColor: "#36A2EB",
                 },
               ],
