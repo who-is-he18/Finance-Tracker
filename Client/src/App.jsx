@@ -16,29 +16,6 @@ function App() {
     equity_bank_balance: 0,
   });
 
-  // Fetch dashboard data (including expenses) and update the state
-  const fetchDashboardData = async () => {
-    const user_id = 9; // Replace with dynamic user ID if needed
-    try {
-      const [expensesRes, dashboardRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/expenses/${user_id}`),
-        axios.get(`http://localhost:5000/api/dashboard/${user_id}`),
-      ]);
-      return {
-        ...dashboardRes.data,
-        total_expenses: expensesRes.data.aggregated_expenses,
-      };
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    // Fetch the initial dashboard data when the component mounts
-    fetchDashboardData();
-  }, []);
-
   return (
     <Router>
       <Routes>

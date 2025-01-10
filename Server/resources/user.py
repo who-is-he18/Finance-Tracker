@@ -52,50 +52,7 @@ class UserResource(Resource):
             'email': user.email
         } for user in users], 200
 
-    def put(self, user_id):
-        """Update user details."""
-        user = User.query.get(user_id)
-
-        if not user:
-            return {'message': 'User not found'}, 404
-
-        data = request.form
-        username = data.get('username')
-        profile_pic = request.files.get('profile_pic')
-
-        if 'current_password' in data:
-            current_password = data['current_password']
-            if not check_password_hash(user.password, current_password):
-                return {'message': 'Current password is incorrect'}, 401
-
-        if username:
-            user.username = username
-
-        if profile_pic:
-            # Ensure the directory exists
-            profile_pic_dir = 'path/to/save/profile_pics'
-            if not os.path.exists(profile_pic_dir):
-                os.makedirs(profile_pic_dir)
-
-            # Save the profile picture to the directory and update the user's profile_pic field
-            profile_pic_path = os.path.join(profile_pic_dir, profile_pic.filename)
-            profile_pic.save(profile_pic_path)
-            user.profile_pic = profile_pic_path
-
-        if 'email' in data:
-            email = data['email']
-            if not email:
-                return {'message': 'Email cannot be empty'}, 400
-            user.email = email
-
-        if 'password' in data:
-            password = data['password']
-            if not password:
-                return {'message': 'Password cannot be empty'}, 400
-            user.password = generate_password_hash(password, method='pbkdf2:sha256')
-
-        db.session.commit()
-        return {'message': 'User updated successfully'}, 200
+    
 
     def delete(self, user_id):
         """Delete a user."""
@@ -109,6 +66,46 @@ class UserResource(Resource):
 
         return {'message': 'User deleted successfully'}, 200
 
+    def put(self, user_id):
+        """Update user details."""
+        user = User.query.get(user_id)
+
+        if not user:
+            return {'message': 'User not found'}, 404
+
+        parser = reqparse.RequestParser()
+        parser.add_argument('username', type=str, required=False)
+        parser.add_argument('email', type=str, required=False)
+        parser.add_argument('password', type=str, required=False)
+        parser.add_argument('current_password', type=str, required=True, help="Current password is required")
+        data = parser.parse_args()
+
+        # Verify current password
+        if not check_password_hash(user.password, data['current_password']):
+            return {'message': 'Current password is incorrect'}, 401
+
+        # Update username if provided
+        if data['username']:
+            user.username = data['username']
+
+        # Update email if provided
+        if data['email']:
+            if not data['email']:
+                return {'message': 'Email cannot be empty'}, 400
+            user.email = data['email']
+
+        # Update password if provided
+        if data['password']:
+            if not data['password']:
+                return {'message': 'Password cannot be empty'}, 400
+            user.password = generate_password_hash(data['password'], method='pbkdf2:sha256')
+
+        try:
+            db.session.commit()
+            return {'message': 'User updated successfully'}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {'message': f'Error: {str(e)}'}, 500
 
 class LoginResource(Resource):
     def post(self):

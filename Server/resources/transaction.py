@@ -101,14 +101,41 @@ class TransactionSummaryResource(Resource):
             "expense_summary": expenses
         }, 200
 
-class ExpenseAggregationResource(Resource):
+class ExpenseBySourceResource(Resource):
     def get(self, user_id):
-        """Aggregate expenses by category for a specific user."""
-        expenses = Transaction.query.filter_by(user_id=user_id).all()
-        aggregated_expenses = {}
+        """Aggregate expenses by source for a specific user."""
+        try:
+            # Query expenses for the user
+            transactions = Transaction.query.filter_by(user_id=user_id, type_of="Expenses").all()
 
-        for expense in expenses:
-            category = expense.category
-            aggregated_expenses[category] = aggregated_expenses.get(category, 0) + expense.amount
+            # Aggregate expenses by source
+            aggregated_expenses = {}
+            for transaction in transactions:
+                source = transaction.source  # Ensure the Transaction model has a 'source' column
+                aggregated_expenses[source] = aggregated_expenses.get(source, 0) + transaction.amount
 
-        return {"aggregated_expenses": aggregated_expenses}, 200
+            return {"expenses_by_source": aggregated_expenses}, 200
+        except Exception as e:
+            return {"message": f"An error occurred: {str(e)}"}, 500
+
+    
+
+
+class IncomeBySourceResource(Resource):
+    def get(self, user_id):
+        """Get income transactions by source for a user."""
+        sources = ["Mpesa", "Family Bank", "Equity"]
+        income_by_source = {source: 0 for source in sources}
+
+        try:
+            # Query income transactions for the user
+            transactions = Transaction.query.filter_by(user_id=user_id, type_of="Income").all()
+
+            # Aggregate income by source
+            for transaction in transactions:
+                if transaction.source in income_by_source:
+                    income_by_source[transaction.source] += transaction.amount
+
+            return {"income_by_source": income_by_source}, 200
+        except Exception as e:
+            return {"message": f"An error occurred: {str(e)}"}, 500

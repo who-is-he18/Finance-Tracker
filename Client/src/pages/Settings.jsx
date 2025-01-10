@@ -84,7 +84,6 @@ const Settings = ({ setBalances }) => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
   };
-
   const formik = useFormik({
     initialValues: {
       newEmail: "",
@@ -117,6 +116,7 @@ const Settings = ({ setBalances }) => {
           fetchSettings();
         } else {
           const errorData = await response.json();
+          console.error("Error response:", errorData);
           toast.error(`Error: ${errorData.message}`);
         }
       } catch (error) {
@@ -161,6 +161,7 @@ const Settings = ({ setBalances }) => {
                   };
 
                   try {
+                    console.log("Updating email with data:", updatedAccount);
                     const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
                       method: "PUT",
                       headers: {
@@ -173,6 +174,7 @@ const Settings = ({ setBalances }) => {
                       toast.success("Email updated successfully!");
                     } else {
                       const errorData = await response.json();
+                      console.error("Error response:", errorData);
                       toast.error(`Error: ${errorData.message}`);
                     }
                   } catch (error) {
@@ -243,6 +245,7 @@ const Settings = ({ setBalances }) => {
                   };
 
                   try {
+                    console.log("Updating password with data:", updatedAccount);
                     const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
                       method: "PUT",
                       headers: {
@@ -255,6 +258,7 @@ const Settings = ({ setBalances }) => {
                       toast.success("Password updated successfully!");
                     } else {
                       const errorData = await response.json();
+                      console.error("Error response:", errorData);
                       toast.error(`Error: ${errorData.message}`);
                     }
                   } catch (error) {
@@ -267,6 +271,7 @@ const Settings = ({ setBalances }) => {
               </button>
             </div>
           </section>
+  
 
           <section className="initial-currency-setup">
             <h2 className="section-title">Initial Currency Setup</h2>

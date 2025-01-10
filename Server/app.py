@@ -33,16 +33,18 @@ db.init_app(app)
 # Import the resources after app and db initialization
 from resources.user import UserResource, LoginResource
 from resources.setting import SettingsResource
-from resources.transaction import TransactionResource, ExpenseAggregationResource
+from resources.transaction import TransactionResource , IncomeBySourceResource , ExpenseBySourceResource
 from resources.dashboard import DashboardResource
 
 # Add resources to the API
 api.add_resource(UserResource, '/api/users', '/api/users/<int:user_id>')
 api.add_resource(LoginResource, '/api/login')
-api.add_resource(SettingsResource, '/api/settings/<int:user_id>')
+api.add_resource(SettingsResource, '/api/settings/initial-currencies/<int:user_id>', '/api/settings/<int:user_id>')
 api.add_resource(TransactionResource, '/api/transactions/<int:user_id>', '/api/transactions/<int:user_id>/<int:transaction_id>')
 api.add_resource(DashboardResource, '/api/dashboard/<int:user_id>')
-api.add_resource(ExpenseAggregationResource, '/api/expenses/<int:user_id>')
+api.add_resource(IncomeBySourceResource, '/api/transactions/income-by-source/<int:user_id>')
+api.add_resource(ExpenseBySourceResource, '/api/transactions/expenses-by-source/<int:user_id>')
+
 
 # Import models after app initialization
 from models.user import User

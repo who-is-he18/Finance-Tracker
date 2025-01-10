@@ -36,3 +36,15 @@ class SettingsResource(Resource):
             return {'message': f'Error: {str(e)}'}, 500  # Return a specific error message
 
         return settings.json(), 200  # 200 OK for successful update
+    
+    def get_initial_currencies(self, user_id):
+        """Retrieve the initial currencies for a specific user."""
+        settings = Settings.query.filter_by(user_id=user_id).first()
+        if settings:
+            initial_currencies = {
+                'mpesa_balance': settings.mpesa_balance,
+                'family_bank_balance': settings.family_bank_balance,
+                'equity_bank_balance': settings.equity_bank_balance
+            }
+            return initial_currencies, 200
+        return {'message': 'Settings not found'}, 404

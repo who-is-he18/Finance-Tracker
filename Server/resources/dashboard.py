@@ -29,6 +29,17 @@ class DashboardResource(Resource):
         # Current savings
         current_savings = total_income - total_expenses
 
+        # Calculate income from different sources
+        income_sources = {
+            "M-Pesa": 0,
+            "Equity Bank": 0,
+            "Family Bank": 0,
+        }
+
+        for transaction in income_transactions:
+            if transaction.source in income_sources:
+                income_sources[transaction.source] += transaction.amount
+
         # Fetch the user's username
         user = User.query.get(user_id)
         if not user:
@@ -41,5 +52,6 @@ class DashboardResource(Resource):
             'current_savings': current_savings,
             'mpesa_balance': mpesa_balance,
             'family_bank_balance': family_bank_balance,
-            'equity_bank_balance': equity_bank_balance
+            'equity_bank_balance': equity_bank_balance,
+            'income_sources': income_sources
         }, 200

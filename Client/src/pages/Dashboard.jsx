@@ -6,19 +6,22 @@ import "react-toastify/dist/ReactToastify.css";
 import "../styles/Dashboard.css";
 
 const Dashboard = () => {
-  const [balances, setBalances] = useState({
+  const [initialBalances, setInitialBalances] = useState({
     mpesa_balance: 0,
     family_bank_balance: 0,
     equity_bank_balance: 0,
   });
 
-  const [dashboardData, setDashboardData] = useState({
-    total_expenses: {
-      Housing: 0,
-      Food: 0,
-      Recreational: 0,
-      Clothing: 0,
-    },
+  const [incomeBySource, setIncomeBySource] = useState({
+    mpesa_income: 0,
+    family_bank_income: 0,
+    equity_bank_income: 0,
+  });
+
+  const [expensesBySource, setExpensesBySource] = useState({
+    mpesa_expenses: 0,
+    family_bank_expenses: 0,
+    equity_bank_expenses: 0,
   });
 
   useEffect(() => {
@@ -26,51 +29,79 @@ const Dashboard = () => {
 
     const user_id = 9; // Replace with dynamic user ID if needed
 
-    const fetchBalances = async () => {
+    // Fetch initial balances (user setup)
+    const fetchInitialBalances = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/settings/${user_id}`);
-        const data = await response.json();
-        setBalances({
-          mpesa_balance: data.mpesa_balance || 0,
-          family_bank_balance: data.family_bank_balance || 0,
-          equity_bank_balance: data.equity_bank_balance || 0,
+        const response = await axios.get(
+          `http://localhost:5000/api/settings/initial-currencies/${user_id}`
+        );
+        console.log("Initial Balances:", response.data); // Debugging log
+        setInitialBalances({
+          mpesa_balance: response.data.mpesa_balance || 0,
+          family_bank_balance: response.data.family_bank_balance || 0,
+          equity_bank_balance: response.data.equity_bank_balance || 0,
         });
       } catch (error) {
-        console.error("Error fetching balances:", error);
-        toast.error("Error fetching balances.");
+        console.error("Error fetching initial balances:", error);
+        toast.error("Error fetching initial balances.");
       }
     };
 
-    const fetchData = async () => {
+    // Fetch income by source
+    const fetchIncomeBySource = async () => {
       try {
-        const [expensesRes, dashboardRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/expenses/${user_id}`),
-          axios.get(`http://localhost:5000/api/dashboard/${user_id}`),
-        ]);
-
-        setDashboardData({
-          ...dashboardRes.data,
-          total_expenses: expensesRes.data.aggregated_expenses,
+        const response = await axios.get(
+          `http://localhost:5000/api/transactions/income-by-source/${user_id}`
+        );
+        console.log("Income by Source Data:", response.data); // Debugging log
+        setIncomeBySource({
+          mpesa_income: response.data.income_by_source["Mpesa"] || 0,
+          family_bank_income: response.data.income_by_source["Family Bank"] || 0,
+          equity_bank_income: response.data.income_by_source["Equity"] || 0,
         });
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        toast.error("Error fetching dashboard data.");
+        console.error("Error fetching income by source:", error);
+        toast.error("Error fetching income by source.");
       }
     };
 
-    fetchBalances();
-    fetchData();
+    // Fetch expenses by source
+    const fetchExpensesBySource = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/transactions/expenses-by-source/${user_id}`
+        );
+        console.log("Expenses by Source Data:", response.data); // Debugging log
+        setExpensesBySource({
+          mpesa_expenses: response.data.expenses_by_source["Mpesa"] || 0,
+          family_bank_expenses:
+            response.data.expenses_by_source["Family Bank"] || 0,
+          equity_bank_expenses: response.data.expenses_by_source["Equity"] || 0,
+        });
+      } catch (error) {
+        console.error("Error fetching expenses by source:", error);
+        toast.error("Error fetching expenses by source.");
+      }
+    };
+
+    fetchInitialBalances();
+    fetchIncomeBySource();
+    fetchExpensesBySource();
   }, []);
 
-  // Calculating total income and savings
-  const totalIncome =
-    balances.mpesa_balance +
-    balances.family_bank_balance +
-    balances.equity_bank_balance;
+  // Calculate the current savings by adding initial currency and income, then subtracting expenses
+  const mpesaSavings = initialBalances.mpesa_balance + incomeBySource.mpesa_income - expensesBySource.mpesa_expenses;
+  const familyBankSavings = initialBalances.family_bank_balance + incomeBySource.family_bank_income - expensesBySource.family_bank_expenses;
+  const equityBankSavings = initialBalances.equity_bank_balance + incomeBySource.equity_bank_income - expensesBySource.equity_bank_expenses;
 
-  const totalSavings =
-    totalIncome -
-    Object.values(dashboardData.total_expenses).reduce((a, b) => a + b, 0);
+  // Calculate total savings
+  const totalSavings = mpesaSavings + familyBankSavings + equityBankSavings;
+
+  // Calculate total income
+  const totalIncome = incomeBySource.mpesa_income + incomeBySource.family_bank_income + incomeBySource.equity_bank_income;
+
+  // Calculate total expenses
+  const totalExpenses = expensesBySource.mpesa_expenses + expensesBySource.family_bank_expenses + expensesBySource.equity_bank_expenses;
 
   return (
     <div className="dashboard-container">
@@ -79,9 +110,9 @@ const Dashboard = () => {
         <section className="card income-card" data-aos="fade-up">
           <h3 className="card-title">TOTAL INCOME</h3>
           <ul className="card-details">
-            <li>M-PESA: KES {balances.mpesa_balance.toLocaleString()}</li>
-            <li>Equity Bank: KES {balances.equity_bank_balance.toLocaleString()}</li>
-            <li>Family Bank: KES {balances.family_bank_balance.toLocaleString()}</li>
+            <li>M-PESA: KES {incomeBySource.mpesa_income.toLocaleString()}</li>
+            <li>Equity Bank: KES {incomeBySource.equity_bank_income.toLocaleString()}</li>
+            <li>Family Bank: KES {incomeBySource.family_bank_income.toLocaleString()}</li>
             <li>
               <strong>TOTAL: KES {totalIncome.toLocaleString()}</strong>
             </li>
@@ -97,13 +128,12 @@ const Dashboard = () => {
         <section className="card expenses-card" data-aos="fade-up">
           <h3 className="card-title">TOTAL EXPENSES</h3>
           <ul className="card-details">
-            {Object.entries(dashboardData.total_expenses).map(
-              ([category, amount]) => (
-                <li key={category}>
-                  {category}: KES {amount.toLocaleString()}
-                </li>
-              )
-            )}
+            <li>M-PESA: KES {expensesBySource.mpesa_expenses.toLocaleString()}</li>
+            <li>Equity Bank: KES {expensesBySource.equity_bank_expenses.toLocaleString()}</li>
+            <li>Family Bank: KES {expensesBySource.family_bank_expenses.toLocaleString()}</li>
+            <li>
+              <strong>TOTAL: KES {totalExpenses.toLocaleString()}</strong>
+            </li>
           </ul>
           <img
             src="/images/Personal finance-bro.png"
@@ -116,11 +146,11 @@ const Dashboard = () => {
         <section className="card savings-card" data-aos="fade-up">
           <h3 className="card-title">CURRENT SAVINGS</h3>
           <ul className="card-details">
-            <li>M-PESA: KES {balances.mpesa_balance.toLocaleString()}</li>
-            <li>Equity Bank: KES {balances.equity_bank_balance.toLocaleString()}</li>
-            <li>Family Bank: KES {balances.family_bank_balance.toLocaleString()}</li>
+            <li>M-PESA Savings: KES {mpesaSavings.toLocaleString()}</li>
+            <li>Equity Bank Savings: KES {equityBankSavings.toLocaleString()}</li>
+            <li>Family Bank Savings: KES {familyBankSavings.toLocaleString()}</li>
             <li>
-              <strong>TOTAL: KES {totalSavings.toLocaleString()}</strong>
+              <strong>TOTAL SAVINGS: KES {totalSavings.toLocaleString()}</strong>
             </li>
           </ul>
           <img
