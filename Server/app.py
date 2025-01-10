@@ -17,7 +17,7 @@ CORS(app, resources={
 })
 
 # Configure the database URI
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://pennywise_6ruk_user:gJsVjUaiPdaI3BPyzVBn9VpcKPuMH607@dpg-ctp767jtq21c73d2is1g-a.oregon-postgres.render.com/pennywise_6ruk'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pennywise.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
 app.config['SECRET_KEY'] = 'your_secret_key'
 
