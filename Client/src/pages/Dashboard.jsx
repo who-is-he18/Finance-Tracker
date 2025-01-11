@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import AOS from "aos";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/Dashboard.css";
@@ -25,9 +24,12 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    AOS.init();
+    const user_id = localStorage.getItem("user_id"); // Retrieve user ID from local storage
 
-    const user_id = 9; // Replace with dynamic user ID if needed
+    if (!user_id) {
+      toast.error("User ID not found.");
+      return;
+    }
 
     // Fetch initial balances (user setup)
     const fetchInitialBalances = async () => {
@@ -107,7 +109,7 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <main className="dashboard-main">
         {/* Income Section */}
-        <section className="card income-card" data-aos="fade-up">
+        <section className="card income-card">
           <h3 className="card-title">TOTAL INCOME</h3>
           <ul className="card-details">
             <li>M-PESA: KES {incomeBySource.mpesa_income.toLocaleString()}</li>
@@ -125,7 +127,7 @@ const Dashboard = () => {
         </section>
 
         {/* Expenses Section */}
-        <section className="card expenses-card" data-aos="fade-up">
+        <section className="card expenses-card">
           <h3 className="card-title">TOTAL EXPENSES</h3>
           <ul className="card-details">
             <li>M-PESA: KES {expensesBySource.mpesa_expenses.toLocaleString()}</li>
@@ -143,7 +145,7 @@ const Dashboard = () => {
         </section>
 
         {/* Savings Section */}
-        <section className="card savings-card" data-aos="fade-up">
+        <section className="card savings-card">
           <h3 className="card-title">CURRENT SAVINGS</h3>
           <ul className="card-details">
             <li>M-PESA Savings: KES {mpesaSavings.toLocaleString()}</li>

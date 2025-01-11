@@ -1,13 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
-import "../styles/Dashboard.css";
+import "../styles/Layout.css";
 
 const Layout = () => {
   const [username, setUsername] = useState("");
+  const [profilePic, setProfilePic] = useState("/images/user-profile_5675125.png");
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
-    const userId = 9; // Replace with actual user ID logic
+    const userId = localStorage.getItem("user_id"); // Retrieve user ID from local storage
+    console.log("Retrieved user ID:", userId); // Debugging log
+
+    if (!userId) {
+      console.error("User ID not found.");
+      return;
+    }
 
     axios
       .get(`http://localhost:5000/api/users/${userId}`)
@@ -22,6 +30,12 @@ const Layout = () => {
       });
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_id");
+    navigate("/login"); // Redirect to login page
+  };
+
   return (
     <div className="dashboard-container">
       {/* Sidebar */}
@@ -29,7 +43,7 @@ const Layout = () => {
         <div className="profile-section">
           <div className="profile-icon">
             <img
-              src="/images/user-profile_5675125.png"
+              src={profilePic}
               alt="Profile"
               className="profile-image"
             />
@@ -46,9 +60,9 @@ const Layout = () => {
           <NavLink to="/settings" className={({ isActive }) => `nav-button ${isActive ? "active" : ""}`}>
             Settings
           </NavLink>
-          <NavLink to="/" className={({ isActive }) => `nav-button ${isActive ? "active" : ""}`}>
+          <button onClick={handleLogout} className="nav-button">
             Logout
-          </NavLink>
+          </button>
         </nav>
       </aside>
 

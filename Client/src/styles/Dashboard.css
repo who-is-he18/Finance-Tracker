@@ -5,48 +5,6 @@
     background-color: #f8fff4; /* Light greenish background */
     font-family: Arial, sans-serif;
 }
-
-/* Sidebar */
-.sidebar {
-    width: 80%;
-    background-color: #ffffff; /* White sidebar */
-    padding: 50px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.profile-section {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.profile-icon {
-    width: 100px; /* Increase size for better visibility */
-    height: 100px;
-    border-radius: 50%; /* Circular image */
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto; /* Center-align */
-    background-color: #f0f0f0; /* Add subtle background for contrast */
-}
-
-.profile-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.welcome-text {
-    margin-top: 15px;
-    font-size: 1.5rem;
-    color: #333333;
-    font-weight: bold;
-}
-
 /* Navigation Links */
 .nav-links {
     display: flex;

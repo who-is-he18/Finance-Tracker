@@ -36,7 +36,9 @@ const Login = () => {
 
         const data = await response.json();
         if (response.ok) {
+          console.log("Login successful, user ID:", data.user_id); // Debugging log
           localStorage.setItem("access_token", data.access_token); // Save the token
+          localStorage.setItem("user_id", data.user_id); // Save the user ID
           navigate("/dashboard"); // Redirect to /dashboard
         } else {
           alert(`Error: ${data.message}`);
@@ -79,7 +81,7 @@ const Login = () => {
             />
             <span 
               onClick={() => setShowPassword(!showPassword)} 
-              className="password-toggle-icon"
+              className="password-toggle-icon-9"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Eye icon */}
             </span>

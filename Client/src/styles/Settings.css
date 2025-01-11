@@ -1,149 +1,129 @@
-/* Settings Page Styles */
+/* General Reset */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Theme Styles */
+body.light {
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+body.dark {
+  background-color: #1e1e1e;
+  color: #ddd;
+}
+
 .settings-container {
-    width: 100%;
-    padding: 30px 50px;
-    background-color: var(--bg-color);
-    color: var(--text-color);
-  }
+  width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--background);
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form Layout */
+.settings-main form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+/* Input Groups */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--text);
+  padding: 10px 0;
+}
+
+.input-group input {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: var(--input-bg);
+  color: var(--text);
+  transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.form-error {
+  font-size: 0.875rem;
+  color: red;
+}
+
+/* Save Button */
+.save-button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.save-button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Password Toggle */
+.password-input-wrapper {
+  display: flex;
+  align-items: center;
   
-  /* Main Content */
-  .settings-main {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
-  
-  /* Section Title */
-  .section-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: var(--title-color);
-  }
-  
-  /* Input Groups */
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 15px;
-  }
-  
-  .input-group label {
-    font-size: 1rem;
-    color: var(--text-color);
-  }
-  
-  .input-group input,
-  .input-group select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    color: var(--text-color);
-    background-color: var(--input-bg);
-  }
-  
-  input::placeholder {
-    color: var(--placeholder-color);
-  }
-  
-  /* Buttons */
-  button {
-    padding: 10px 20px;
-    font-size: 1rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .delete-account-btn {
-    background-color: #e74c3c;
-    color: #fff;
-  }
-  
-  .edit-profile-pic-btn {
-    background-color: var(--button-bg);
-    color: var(--button-text);
-  }
-  
-  .delete-account-btn:hover {
-    background-color: #c0392b;
-  }
-  
-  /* Profile Picture */
-  .profile-pic-preview {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .profile-preview-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  /* Theme Customization */
-  .theme-options {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .theme-button {
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    border: 2px solid transparent;
-    background-color: var(--button-bg);
-    color: var(--text-color);
-  }
-  
-  .theme-button.active,
-  .theme-button:hover {
-    border-color: var(--accent-color);
-    background-color: var(--button-hover-bg);
-    color: #fff;
-  }
-  
-  /* Dynamic Theme Variables */
-  :root {
-    /* Light Theme */
-    --bg-color: #ffffff;
-    --text-color: #333333;
-    --title-color: #28a745;
-    --button-bg: #f0f0f0;
-    --button-text: #333333;
-    --button-hover-bg: #28a745;
-    --accent-color: #28a745;
-    --input-bg: #ffffff;
-    --placeholder-color: #aaa;
-  }
-  
-  body.dark {
-    /* Dark Theme */
-    --bg-color: #121212;
-    --text-color: #ffffff;
-    --title-color: #82e77f;
-    --button-bg: #333333;
-    --button-text: #ffffff;
-    --button-hover-bg: #28a745;
-    --accent-color: #82e77f;
-    --input-bg: #333333;
-    --placeholder-color: #555;
-  }
-  .password-toggle-icon-1 {
-    position: absolute;
-    top: 50.9%;
-    right: 459px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #2e7d32;
-  }
-  
+}
+
+.password-input-wrapper input {
+  flex: 1;
+}
+
+.password-toggle-icon-8 {
+  cursor: pointer;
+  margin-left: -30px;
+  color: var(--text);
+}
+.password-toggle-icon-7 {
+  cursor: pointer;
+  margin-left: -30px;
+  color: var(--text);
+}
+
+/* Theme Variables */
+:root {
+  --primary: #4CAF50;
+  --primary-dark: #4CAF50;
+  --input-bg: #fff;
+  --text: #333;
+}
+
+body.dark :root {
+  --primary: #66d9ff;
+  --primary-dark: #33bbff;
+  --input-bg: #2b2b2b;
+  --text: #ddd;
+}

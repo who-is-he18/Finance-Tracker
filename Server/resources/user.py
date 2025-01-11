@@ -52,8 +52,6 @@ class UserResource(Resource):
             'email': user.email
         } for user in users], 200
 
-    
-
     def delete(self, user_id):
         """Delete a user."""
         user = User.query.get(user_id)
@@ -123,4 +121,4 @@ class LoginResource(Resource):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
-        return {'access_token': token}, 200
+        return {'access_token': token, 'user_id': user.id}, 200

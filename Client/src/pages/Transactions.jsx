@@ -26,11 +26,15 @@ const Transactions = () => {
     description: "",
   });
 
-  const userId = 9; // Replace with dynamic user ID
+  const userId = localStorage.getItem("user_id"); // Retrieve user ID from local storage
 
   useEffect(() => {
+    if (!userId) {
+      toast.error("User ID not found.");
+      return;
+    }
     fetchTransactions();
-  }, []);
+  }, [userId]);
 
   const fetchTransactions = async () => {
     try {
@@ -242,7 +246,7 @@ const Transactions = () => {
                 <th>Date</th>
                 <th>Type</th>
                 <th>Category</th>
-                <th>Source</th>
+                <th>Source/</th>
                 <th>Amount</th>
                 <th>Description</th>
                 <th>Actions</th>

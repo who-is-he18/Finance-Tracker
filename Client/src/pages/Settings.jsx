@@ -15,16 +15,20 @@ const Settings = ({ setBalances }) => {
     family_bank_balance: 0,
     equity_bank_balance: 0,
   });
-  const userId = 9; // Replace with actual logged-in user ID
+  const userId = localStorage.getItem("user_id"); // Retrieve user ID from local storage
 
   useEffect(() => {
+    if (!userId) {
+      toast.error("User ID not found.");
+      return;
+    }
     fetchSettings();
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme) {
       setTheme(savedTheme);
       document.body.className = savedTheme;
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     document.body.className = theme;
@@ -84,6 +88,7 @@ const Settings = ({ setBalances }) => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
   };
+
   const formik = useFormik({
     initialValues: {
       newEmail: "",
@@ -198,7 +203,7 @@ const Settings = ({ setBalances }) => {
                   placeholder="Enter new password"
                 />
                 <span
-                  className="password-toggle-icon"
+                  className="password-toggle-icon-8"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 >
                   {showNewPassword ? <FaEyeSlash /> : <FaEye />}
@@ -220,7 +225,7 @@ const Settings = ({ setBalances }) => {
                   placeholder="Confirm new password"
                 />
                 <span
-                  className="password-toggle-icon"
+                  className="password-toggle-icon-7"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
@@ -312,26 +317,6 @@ const Settings = ({ setBalances }) => {
             >
               Save Balances
             </button>
-          </section>
-
-          <section className="theme-customization">
-            <h2 className="section-title">Theme Customization</h2>
-            <div className="theme-options">
-              <button
-                type="button"
-                className={`theme-button ${theme === "light" ? "active" : ""}`}
-                onClick={() => handleThemeChange("light")}
-              >
-                Light Theme
-              </button>
-              <button
-                type="button"
-                className={`theme-button ${theme === "dark" ? "active" : ""}`}
-                onClick={() => handleThemeChange("dark")}
-              >
-                Dark Theme
-              </button>
-            </div>
           </section>
         </form>
       </main>
