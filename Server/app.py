@@ -4,22 +4,31 @@ from flask_restful import Api
 from flask_cors import CORS
 from Server.database import db
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from.env file
+load_dotenv()
 
 # Initialize the Flask application
 app = Flask(__name__)
 
 # Enable CORS for the specific React frontend origin
+# Enable CORS for both local and deployed React frontend origins
 CORS(app, resources={
     r"/api/*": {
-        "origins": "http://localhost:5173",
+        "origins": [
+            "http://localhost:5173",  # Local development URL
+            "https://finance-tracker-5.onrender.com"  # Deployed React frontend URL
+        ],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
     }
 })
 
+
 # Configure the database URI
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pennywise.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'pennywise.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'your_secret_key'
 
 # Initialize Flask-RESTful API
