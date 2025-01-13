@@ -37,14 +37,12 @@ const Dashboard = () => {
         const response = await axios.get(
           `http://localhost:5000/api/settings/initial-currencies/${user_id}`
         );
-        console.log("Initial Balances:", response.data); // Debugging log
         setInitialBalances({
           mpesa_balance: response.data.mpesa_balance || 0,
           family_bank_balance: response.data.family_bank_balance || 0,
           equity_bank_balance: response.data.equity_bank_balance || 0,
         });
       } catch (error) {
-        console.error("Error fetching initial balances:", error);
         toast.error("Error fetching initial balances.");
       }
     };
@@ -55,14 +53,12 @@ const Dashboard = () => {
         const response = await axios.get(
           `http://localhost:5000/api/transactions/income-by-source/${user_id}`
         );
-        console.log("Income by Source Data:", response.data); // Debugging log
         setIncomeBySource({
           mpesa_income: response.data.income_by_source["Mpesa"] || 0,
           family_bank_income: response.data.income_by_source["Family Bank"] || 0,
           equity_bank_income: response.data.income_by_source["Equity"] || 0,
         });
       } catch (error) {
-        console.error("Error fetching income by source:", error);
         toast.error("Error fetching income by source.");
       }
     };
@@ -73,7 +69,6 @@ const Dashboard = () => {
         const response = await axios.get(
           `http://localhost:5000/api/transactions/expenses-by-source/${user_id}`
         );
-        console.log("Expenses by Source Data:", response.data); // Debugging log
         setExpensesBySource({
           mpesa_expenses: response.data.expenses_by_source["Mpesa"] || 0,
           family_bank_expenses:
@@ -81,11 +76,9 @@ const Dashboard = () => {
           equity_bank_expenses: response.data.expenses_by_source["Equity"] || 0,
         });
       } catch (error) {
-        console.error("Error fetching expenses by source:", error);
         toast.error("Error fetching expenses by source.");
       }
     };
-
     fetchInitialBalances();
     fetchIncomeBySource();
     fetchExpensesBySource();
@@ -137,11 +130,7 @@ const Dashboard = () => {
               <strong>TOTAL: KES {totalExpenses.toLocaleString()}</strong>
             </li>
           </ul>
-          <img
-            src="/images/Personal finance-bro.png"
-            alt="Expenses"
-            className="card-image"
-          />
+          <img src="/images/Personal finance-bro.png"alt="Expenses"className="card-image"/>
         </section>
 
         {/* Savings Section */}
@@ -155,11 +144,7 @@ const Dashboard = () => {
               <strong>TOTAL SAVINGS: KES {totalSavings.toLocaleString()}</strong>
             </li>
           </ul>
-          <img
-            src="/images/Savings-pana.png"
-            alt="Savings"
-            className="card-image"
-          />
+          <img src="/images/Savings-pana.png"alt="Savings"className="card-image"/>
         </section>
       </main>
     </div>

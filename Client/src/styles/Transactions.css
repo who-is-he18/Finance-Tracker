@@ -176,3 +176,10 @@ button.cancel {
 button.cancel:hover {
   background-color: #c9302c;
 }
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 0.5rem;
+  color: var(--primary);
+}

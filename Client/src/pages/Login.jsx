@@ -6,10 +6,9 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import the eye icons
 import "../styles/Login.css";
 
 const Login = () => {
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate(); 
 
-  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
-
+  const [showPassword, setShowPassword] = useState(false); 
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -36,7 +35,6 @@ const Login = () => {
 
         const data = await response.json();
         if (response.ok) {
-          console.log("Login successful, user ID:", data.user_id); // Debugging log
           localStorage.setItem("access_token", data.access_token); // Save the token
           localStorage.setItem("user_id", data.user_id); // Save the user ID
           navigate("/dashboard"); // Redirect to /dashboard
@@ -71,7 +69,7 @@ const Login = () => {
           </div>
           <div className="password-field">
             <input
-              type={showPassword ? "text" : "password"} // Toggle password visibility
+              type={showPassword ? "text" : "password"} 
               name="password"
               placeholder="Password"
               className="login-input"
@@ -83,7 +81,7 @@ const Login = () => {
               onClick={() => setShowPassword(!showPassword)} 
               className="password-toggle-icon-9"
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Eye icon */}
+              {showPassword ? <FaEyeSlash /> : <FaEye />} 
             </span>
             {formik.touched.password && formik.errors.password && (
               <div className="error">{formik.errors.password}</div>
@@ -94,7 +92,7 @@ const Login = () => {
           </button>
         </form>
         <p className="login-text">
-          Don’t have an account? <a href="/signup">Sign Up</a>
+          Don't have an account? <a href="/signup">Sign Up</a>
         </p>
       </div>
     </div>

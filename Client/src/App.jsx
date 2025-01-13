@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
-import Layout from "./pages/Layout"; // Layout component
+import Layout from "./pages/Layout"; 
 
 function App() {
   const [balances, setBalances] = useState({

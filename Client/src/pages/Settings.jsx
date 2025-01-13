@@ -38,7 +38,6 @@ const Settings = ({ setBalances }) => {
     try {
       const response = await fetch(`http://localhost:5000/api/settings/${userId}`);
       const data = await response.json();
-      console.log("Fetched settings data:", data);
 
       setInitialBalances({
         mpesa_balance: data.mpesa_balance || 0,
@@ -84,10 +83,7 @@ const Settings = ({ setBalances }) => {
     setInitialBalances((prev) => ({ ...prev, [name]: parseFloat(value) || 0 }));
   };
 
-  const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-  };
+  
 
   const formik = useFormik({
     initialValues: {
@@ -166,7 +162,6 @@ const Settings = ({ setBalances }) => {
                   };
 
                   try {
-                    console.log("Updating email with data:", updatedAccount);
                     const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
                       method: "PUT",
                       headers: {
@@ -250,7 +245,6 @@ const Settings = ({ setBalances }) => {
                   };
 
                   try {
-                    console.log("Updating password with data:", updatedAccount);
                     const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
                       method: "PUT",
                       headers: {
