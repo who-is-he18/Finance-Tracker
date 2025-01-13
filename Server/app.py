@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_cors import CORS
 from db import db
+import os
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -33,7 +34,7 @@ db.init_app(app)
 # Import the resources after app and db initialization
 from resources.user import UserResource, LoginResource
 from resources.setting import SettingsResource
-from resources.transaction import TransactionResource , IncomeBySourceResource , ExpenseBySourceResource
+from resources.transaction import TransactionResource, IncomeBySourceResource, ExpenseBySourceResource
 from resources.dashboard import DashboardResource
 
 # Add resources to the API
@@ -45,13 +46,17 @@ api.add_resource(DashboardResource, '/api/dashboard/<int:user_id>')
 api.add_resource(IncomeBySourceResource, '/api/transactions/income-by-source/<int:user_id>')
 api.add_resource(ExpenseBySourceResource, '/api/transactions/expenses-by-source/<int:user_id>')
 
-
 # Import models after app initialization
 from models.user import User
 
-@app.route('/')
-def home():
-    return "Welcome to the Finance Tracker App"
+# Serve React frontend
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_static(path):
+    if path != "" and os.path.exists(os.path.join('dist', path)):
+        return send_from_directory('dist', path)
+    else:
+        return send_from_directory('dist', 'index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
