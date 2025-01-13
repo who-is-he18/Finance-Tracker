@@ -6,14 +6,17 @@ import "../styles/Layout.css";
 const Layout = () => {
   const [username, setUsername] = useState("");
   const [profilePic, setProfilePic] = useState("/images/user-profile_5675125.png");
-  const navigate = useNavigate(); 
+  const navigate = useNavigate(); // Initialize navigate
 
   useEffect(() => {
     const userId = localStorage.getItem("user_id"); // Retrieve user ID from local storage
+    console.log("Retrieved user ID:", userId); // Debugging log
+
     if (!userId) {
       console.error("User ID not found.");
       return;
     }
+
     axios
       .get(`http://localhost:5000/api/users/${userId}`)
       .then((response) => {
@@ -30,7 +33,7 @@ const Layout = () => {
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user_id");
-    navigate("/login"); 
+    navigate("/login"); // Redirect to login page
   };
 
   return (

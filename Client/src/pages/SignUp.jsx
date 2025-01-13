@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import the eye icons
 import "../styles/SignUp.css";
 
 const SignUp = () => {
   const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] = useState(false); 
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to toggle confirm password visibility
 
   const formik = useFormik({
     initialValues: {
@@ -94,7 +94,7 @@ const SignUp = () => {
           </div>
           <div className="form-group">
             <input
-              type={showPassword ? "text" : "password"} 
+              type={showPassword ? "text" : "password"} // Toggle password visibility
               name="password"
               placeholder="Password"
               className="form-input"
@@ -106,7 +106,7 @@ const SignUp = () => {
               onClick={() => setShowPassword(!showPassword)} 
               className="password-toggle-icon"
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />} 
+              {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Eye icon */}
             </span>
             {formik.touched.password && formik.errors.password && (
               <div className="form-error">{formik.errors.password}</div>
@@ -114,7 +114,7 @@ const SignUp = () => {
           </div>
           <div className="form-group">
             <input
-              type={showConfirmPassword ? "text" : "password"} 
+              type={showConfirmPassword ? "text" : "password"} // Toggle confirm password visibility
               name="confirmPassword"
               placeholder="Confirm Password"
               className="form-input"
@@ -126,7 +126,7 @@ const SignUp = () => {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
               className="password-toggle-icon"
             >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />} 
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />} {/* Eye icon */}
             </span>
             {formik.touched.confirmPassword && formik.errors.confirmPassword && (
               <div className="form-error">{formik.errors.confirmPassword}</div>

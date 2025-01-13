@@ -378,7 +378,6 @@ const Transactions = () => {
 
         {/* Transaction Graph */}
         <section className="transactions-graph">
-          <h2 className="h2">Transaction Categories</h2>
           <Bar
             data={{
               labels: combinedLabels,
