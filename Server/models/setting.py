@@ -1,4 +1,4 @@
-from db import db
+from Server.database import db
 
 class Settings(db.Model):
     __tablename__ = 'settings'

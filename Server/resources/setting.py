@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
-from models.setting import Settings
-from db import db
+from Server.models.setting import Settings
+from Server.database import db
 
 class SettingsResource(Resource):
     def get(self, user_id):

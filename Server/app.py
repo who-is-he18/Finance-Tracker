@@ -2,7 +2,7 @@ from flask import Flask, jsonify, send_from_directory
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_cors import CORS
-from db import db
+from Server.database import db
 import os
 
 # Initialize the Flask application
@@ -32,10 +32,10 @@ migrate = Migrate(app, db)
 db.init_app(app)
 
 # Import the resources after app and db initialization
-from resources.user import UserResource, LoginResource
-from resources.setting import SettingsResource
-from resources.transaction import TransactionResource, IncomeBySourceResource, ExpenseBySourceResource
-from resources.dashboard import DashboardResource
+from Server.resources.user import UserResource, LoginResource
+from Server.resources.setting import SettingsResource
+from Server.resources.transaction import TransactionResource, IncomeBySourceResource, ExpenseBySourceResource
+from Server.resources.dashboard import DashboardResource
 
 # Add resources to the API
 api.add_resource(UserResource, '/api/users', '/api/users/<int:user_id>')
@@ -47,7 +47,7 @@ api.add_resource(IncomeBySourceResource, '/api/transactions/income-by-source/<in
 api.add_resource(ExpenseBySourceResource, '/api/transactions/expenses-by-source/<int:user_id>')
 
 # Import models after app initialization
-from models.user import User
+from Server.models.user import User
 
 # Serve React frontend
 @app.route('/', defaults={'path': ''})

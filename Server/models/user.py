@@ -1,5 +1,5 @@
 from datetime import datetime
-from db import db
+from Server.database import db
 
 # SerializerMixin defined in this file
 class SerializerMixin:

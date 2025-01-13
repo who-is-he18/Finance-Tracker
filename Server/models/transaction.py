@@ -1,4 +1,4 @@
-from db import db
+from Server.database import db
 
 class Transaction(db.Model):
     __tablename__ = "transactions"

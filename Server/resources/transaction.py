@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse
 from flask import request
-from models.transaction import Transaction
-from db import db
+from Server.models.transaction import Transaction
+from Server.database import db
 import logging
 
 class TransactionResource(Resource):
