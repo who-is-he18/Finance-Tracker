@@ -1,11 +1,12 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_cors import CORS
 from db import db
+import os
 
 # Initialize the Flask application
-app = Flask(__name__)
+app = Flask(__name__, static_folder="Client/dist", static_url_path="")
 
 # Enable CORS for the specific React frontend origin
 CORS(app, resources={
@@ -45,6 +46,10 @@ api.add_resource(DashboardResource, '/api/dashboard/<int:user_id>')
 api.add_resource(IncomeBySourceResource, '/api/transactions/income-by-source/<int:user_id>')
 api.add_resource(ExpenseBySourceResource, '/api/transactions/expenses-by-source/<int:user_id>')
 
+# Catch-all route to serve React's index.html for all non-API routes
+@app.route('/<path:path>', methods=['GET'])
+def catch_all(path):
+    return send_from_directory(os.path.join(app.root_path, 'Client', 'dist'), 'index.html')
 
 # Import models after app initialization
 from models.user import User
