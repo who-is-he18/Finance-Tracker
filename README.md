@@ -89,8 +89,8 @@ OpenAI for assistance with development insights.
 ## Contact
 For questions or support, contact:
 
-- Email: your-email@example.com
-- GitHub: your-username
+- Email: waiganjogeoffrey2005@gmail.com
+- GitHub: who-is-he 18
 
 
 Thank you for using PENNYWISE! Manage your finances wisely and effectively. 😊 ```
