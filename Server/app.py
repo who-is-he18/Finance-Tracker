@@ -10,7 +10,7 @@ app = Flask(__name__)
 # Enable CORS for the specific React frontend origin
 CORS(app, resources={
     r"/api/*": {
-        "origins": "http://localhost:5173",
+        "origins": "https://pennywise-frontend-y27l.onrender.com",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
     }
