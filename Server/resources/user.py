@@ -4,8 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 import os
-from Server.database import db
-from Server.models.user import User
+from db import db
+from models.user import User
 
 class UserResource(Resource):
     def post(self):

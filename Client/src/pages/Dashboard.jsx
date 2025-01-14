@@ -35,7 +35,7 @@ const Dashboard = () => {
     const fetchInitialBalances = async () => {
       try {
         const response = await axios.get(
-          `https://finance-tracker-5.onrender.com/api/settings/initial-currencies/${user_id}`
+          `http://127.0.0.1:5000/api/settings/initial-currencies/${user_id}`
         );
         setInitialBalances({
           mpesa_balance: response.data.mpesa_balance || 0,
@@ -51,7 +51,7 @@ const Dashboard = () => {
     const fetchIncomeBySource = async () => {
       try {
         const response = await axios.get(
-          `https://finance-tracker-5.onrender.com/api/transactions/income-by-source/${user_id}`
+          `http://127.0.0.1:5000/api/transactions/income-by-source/${user_id}`
         );
         setIncomeBySource({
           mpesa_income: response.data.income_by_source["Mpesa"] || 0,
@@ -67,7 +67,7 @@ const Dashboard = () => {
     const fetchExpensesBySource = async () => {
       try {
         const response = await axios.get(
-          `https://finance-tracker-5.onrender.com/api/transactions/expenses-by-source/${user_id}`
+          `http://127.0.0.1:5000/api/transactions/expenses-by-source/${user_id}`
         );
         setExpensesBySource({
           mpesa_expenses: response.data.expenses_by_source["Mpesa"] || 0,

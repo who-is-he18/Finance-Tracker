@@ -1,7 +1,7 @@
 from flask_restful import Resource
-from Server.models.transaction import Transaction
-from Server.models.setting import Settings
-from Server.models.user import User
+from models.transaction import Transaction
+from models.setting import Settings
+from models.user import User
 
 class DashboardResource(Resource):
     def get(self, user_id):
