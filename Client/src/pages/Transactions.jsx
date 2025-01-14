@@ -38,7 +38,7 @@ const Transactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/transactions/${userId}`);
+      const response = await fetch(`https://pennywise-backend-gywb.onrender.com/api/transactions/${userId}`);
       const data = await response.json();
       setTransactions(data.transactions);
 
@@ -99,7 +99,7 @@ const Transactions = () => {
       console.log("Transaction to add:", transactionToAdd);
 
       try {
-        const response = await fetch(`http://localhost:5000/api/transactions/${userId}`, {
+        const response = await fetch(`https://pennywise-backend-gywb.onrender.com/api/transactions/${userId}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(transactionToAdd),
@@ -151,7 +151,7 @@ const Transactions = () => {
       };
 
       try {
-        const response = await fetch(`http://localhost:5000/api/transactions/${userId}/${currentTransaction.id}`, {
+        const response = await fetch(`https://pennywise-backend-gywb.onrender.com/api/transactions/${userId}/${currentTransaction.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updatedTransaction),
@@ -200,7 +200,7 @@ const Transactions = () => {
 
     if (result.isConfirmed) {
       try {
-        await fetch(`http://localhost:5000/api/transactions/${userId}/${id}`, {
+        await fetch(`https://pennywise-backend-gywb.onrender.com/api/transactions/${userId}/${id}`, {
           method: "DELETE",
         });
 

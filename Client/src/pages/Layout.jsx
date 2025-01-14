@@ -10,15 +10,13 @@ const Layout = () => {
 
   useEffect(() => {
     const userId = localStorage.getItem("user_id"); // Retrieve user ID from local storage
-    console.log("Retrieved user ID:", userId); // Debugging log
-
     if (!userId) {
       console.error("User ID not found.");
       return;
     }
 
     axios
-      .get(`http://localhost:5000/api/users/${userId}`)
+      .get(`https://pennywise-backend-gywb.onrender.com/api/users/${userId}`)
       .then((response) => {
         setUsername(response.data.username);
         if (response.data.profile_pic) {

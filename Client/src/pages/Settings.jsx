@@ -36,9 +36,8 @@ const Settings = ({ setBalances }) => {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/settings/${userId}`);
+      const response = await fetch(`https://pennywise-backend-gywb.onrender.com/api/settings/${userId}`);
       const data = await response.json();
-      console.log("Fetched settings data:", data);
 
       setInitialBalances({
         mpesa_balance: data.mpesa_balance || 0,
@@ -58,7 +57,7 @@ const Settings = ({ setBalances }) => {
 
   const handleSaveBalances = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/settings/${userId}`, {
+      const response = await fetch(`https://pennywise-backend-gywb.onrender.com/api/settings/${userId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -108,7 +107,7 @@ const Settings = ({ setBalances }) => {
       };
 
       try {
-        const response = await fetch(`http://localhost:5000/api/settings/${userId}`, {
+        const response = await fetch(`https://pennywise-backend-gywb.onrender.com/api/settings/${userId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -167,7 +166,7 @@ const Settings = ({ setBalances }) => {
 
                   try {
                     console.log("Updating email with data:", updatedAccount);
-                    const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+                    const response = await fetch(`https://pennywise-backend-gywb.onrender.com/api/users/${userId}`, {
                       method: "PUT",
                       headers: {
                         "Content-Type": "application/json",
@@ -251,7 +250,7 @@ const Settings = ({ setBalances }) => {
 
                   try {
                     console.log("Updating password with data:", updatedAccount);
-                    const response = await fetch(`http://localhost:5000/api/users/${userId}`, {
+                    const response = await fetch(`https://pennywise-backend-gywb.onrender.com/api/users/${userId}`, {
                       method: "PUT",
                       headers: {
                         "Content-Type": "application/json",
